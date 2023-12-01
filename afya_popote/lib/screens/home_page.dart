@@ -1,0 +1,118 @@
+import 'package:afya_popote/components/appointment_card.dart';
+import 'package:afya_popote/components/doctor_card.dart';
+import 'package:afya_popote/models/auth_model.dart';
+import 'package:afya_popote/utils/config.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  Map<String, dynamic> user = {};
+  Map<String, dynamic> doctor = {};
+  List<dynamic> favList = [];
+  @override
+  Widget build(BuildContext context) {
+    Config().init(context);
+    user = Provider.of<AuthModel>(context, listen: false).getUser;
+    doctor = Provider.of<AuthModel>(context, listen: false).getAppointment;
+    favList = Provider.of<AuthModel>(context, listen: false).getFav;
+
+    return Scaffold(
+      //if user is empty, then return progress indicator
+      body: user.isEmpty
+          ? const Center(
+        child: CircularProgressIndicator(),
+      )
+          : Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 15,
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                //Demetrius
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: <Widget>[
+                //     Text(
+                //       user['name'],
+                //       style: const TextStyle(
+                //         fontSize: 24,
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //     const SizedBox(
+                //       child: CircleAvatar(
+                //         radius: 30,
+                //         backgroundImage:
+                //             AssetImage('assets/profile1.jpg'),
+                //       ),
+                //     )
+                //   ],
+                // ),
+
+                // doctor.isNotEmpty
+                //     ? AppointmentCard(
+                //   doctor: doctor,
+                //   color: Config.primaryColor,
+                // )
+                //     : Container(
+                //   width: double.infinity,
+                //   decoration: BoxDecoration(
+                //     color: Colors.grey.shade300,
+                //     borderRadius: BorderRadius.circular(10),
+                //   ),
+                //   child: const Center(
+                //     child: Padding(
+                //       padding: EdgeInsets.all(20),
+                //       child: Text(
+                //         'Hauna Ahadi (Appointment) na Daktari siku ya leo',
+                //         style: TextStyle(
+                //           fontSize: 16,
+                //           fontWeight: FontWeight.w600,
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
+                Config.spaceSmall,
+
+                const Text(
+                  'Chagua daktari unayehitaji kukutana nae',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Config.spaceSmall,
+                Column(
+                  children: List.generate(user['doctor'].length, (index) {
+                    return DoctorCard(
+                      doctor: user['doctor'][index],
+                      //if lates fav list contains particular doctor id, then show fav icon
+                      isFav: favList
+                          .contains(user['doctor'][index]['doc_id'])
+                          ? true
+                          : false,
+                    );
+                  }),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
